@@ -28,6 +28,34 @@ Included validators:
 
 Example
 -------
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/jamescun/legit"
+)
+
+type User struct {
+	Email legit.Email    `json:"email"`
+	Age   legit.Positive `json:"age"`
+}
+
+func Handler(w http.ResponseWriter, r *http.Request) {
+	var user User
+	err := legit.ParseRequestAndValidate(r, &user)
+	if err != nil {
+		fmt.Fprintln(w, "invalid user:", err)
+		return
+	}
+}
+```
+
+
+Custom Example
+--------------
 
 ```go
 package main
