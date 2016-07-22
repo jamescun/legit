@@ -32,6 +32,12 @@ func NewForm() Form {
 
 // ParseAndValidate first decodes a reader using the first decoder matching the
 // given mime type, then applies validation to the collected input
+func ParseAndValidate(r io.Reader, mime string, dst interface{}) error {
+	return form.ParseAndValidate(r, mime, dst)
+}
+
+// ParseAndValidate first decodes a reader using the first decoder matching the
+// given mime type, then applies validation to the collected input
 func (f Form) ParseAndValidate(r io.Reader, mime string, dst interface{}) error {
 	dec := f.Decoders.Match(mime)
 	if dec == nil {
@@ -49,6 +55,12 @@ func (f Form) ParseAndValidate(r io.Reader, mime string, dst interface{}) error 
 	}
 
 	return nil
+}
+
+// ParseRequestAndValidate is the same as ParseAndValidate accepting a HTTP
+// request for the reader and using the "Content-Type" header for the MIME type
+func ParseRequestAndValidate(r *http.Request, dst interface{}) error {
+	return form.ParseRequestAndValidate(r, dst)
 }
 
 // ParseRequestAndValidate is the same as ParseAndValidate accepting a HTTP
