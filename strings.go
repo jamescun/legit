@@ -124,3 +124,16 @@ func (a ASCII) Validate() error {
 
 	return nil
 }
+
+// Required validates any string that is not empty
+type Required string
+
+var errRequired = errors.New("string is required")
+
+func (r Required) Validate() error {
+	if len(r) < 1 {
+		return errRequired
+	}
+
+	return nil
+}

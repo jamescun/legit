@@ -38,6 +38,10 @@ func TestASCII(t *testing.T) {
 	testString(t, ASCII("abc123"), ASCII("föö"), errASCII)
 }
 
+func TestRequired(t *testing.T) {
+	testString(t, Required("foo"), Required(""), errRequired)
+}
+
 func testString(t *testing.T, pass, fail Validator, failErr error) {
 	assert.NoError(t, pass.Validate())
 
