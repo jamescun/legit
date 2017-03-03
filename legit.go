@@ -48,6 +48,11 @@ func Validate(src interface{}) error {
 }
 
 func (l Legit) Validate(src interface{}) error {
+	// prevent Validation methods being called on nil pointers
+	if src == nil {
+		return nil
+	}
+
 	// skip reflection if src implements custom Validator interface
 	if obj, ok := src.(Validator); ok {
 		return obj.Validate()
@@ -60,6 +65,11 @@ func (l Legit) Validate(src interface{}) error {
 }
 
 func (l Legit) validate(objv reflect.Value, objt reflect.Type) error {
+	// don't attempt to validate pointers (optional fields)
+	if objv.Kind() == reflect.Ptr && objv.IsNil() {
+		return nil
+	}
+
 	if objt.Implements(validator) {
 		return objv.Interface().(Validator).Validate()
 	}
@@ -102,6 +112,7 @@ func (l Legit) validateStruct(objv reflect.Value, objt reflect.Type) error {
 		// TODO: is there a better way to determine if a field is exported?
 		if len(ft.PkgPath) < 1 {
 			fv := objv.Field(i)
+
 			err := l.validate(fv, fv.Type())
 			if err != nil {
 				errors = append(errors, StructError{Field: ft.Name, Message: err})
