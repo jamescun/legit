@@ -2,6 +2,7 @@ package legit
 
 import (
 	"bytes"
+	"encoding/xml"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,5 +29,28 @@ func TestJSON_Decode(t *testing.T) {
 	err := j.Decode(r, &body)
 	if assert.NoError(t, err) {
 		assert.Equal(t, "hello world", body)
+	}
+}
+
+func TestXML_Match(t *testing.T) {
+	x := XML{}
+
+	assert.True(t, x.Match("application/xml"))
+	assert.True(t, x.Match("application/xml; charset=utf-8"))
+	assert.False(t, x.Match("application/json"))
+}
+
+func TestXML_Decode(t *testing.T) {
+	x := XML{}
+	r := bytes.NewReader([]byte(`<Test><Value>Hello World</Value></Test>`))
+
+	var body struct {
+		XMLName xml.Name `xml:"Test"`
+
+		Value string `xml:"Value"`
+	}
+	err := x.Decode(r, &body)
+	if assert.NoError(t, err) {
+		assert.Equal(t, "Hello World", body.Value)
 	}
 }

@@ -2,6 +2,7 @@ package legit
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"io"
 	"strings"
 )
@@ -38,4 +39,14 @@ func (j JSON) Match(mime string) bool {
 
 func (j JSON) Decode(r io.Reader, dst interface{}) error {
 	return json.NewDecoder(r).Decode(dst)
+}
+
+type XML struct{}
+
+func (x XML) Match(mime string) bool {
+	return strings.HasPrefix(mime, "application/xml")
+}
+
+func (x XML) Decode(r io.Reader, dst interface{}) error {
+	return xml.NewDecoder(r).Decode(dst)
 }
