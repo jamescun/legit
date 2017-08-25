@@ -1,12 +1,18 @@
 package legit
 
 import (
+	"database/sql/driver"
 	"errors"
+	"strings"
 	"unicode"
 )
 
 // Lower validates any string not containing any uppercase characters.
 type Lower string
+
+func (l Lower) Value() (driver.Value, error) {
+	return string(l), nil
+}
 
 var errLower = errors.New("string is not lowercase")
 
@@ -23,6 +29,10 @@ func (l Lower) Validate() error {
 // Upper validates any string not containing any lowercase characters.
 type Upper string
 
+func (u Upper) Value() (driver.Value, error) {
+	return string(u), nil
+}
+
 var errUpper = errors.New("string is not uppercase")
 
 func (u Upper) Validate() error {
@@ -37,6 +47,10 @@ func (u Upper) Validate() error {
 
 // NoSpace validates any string not containing any whitespace characters.
 type NoSpace string
+
+func (ns NoSpace) Value() (driver.Value, error) {
+	return string(ns), nil
+}
 
 var errNoSpace = errors.New("string contains whitespace")
 
@@ -53,6 +67,10 @@ func (ns NoSpace) Validate() error {
 // Printable validates any string not containing any non-printing characters.
 type Printable string
 
+func (p Printable) Value() (driver.Value, error) {
+	return string(p), nil
+}
+
 var errPrintable = errors.New("string contains non-printing characters")
 
 func (p Printable) Validate() error {
@@ -67,6 +85,10 @@ func (p Printable) Validate() error {
 
 // Alpha validates any string containing only letters.
 type Alpha string
+
+func (a Alpha) Value() (driver.Value, error) {
+	return string(a), nil
+}
 
 var errAlpha = errors.New("string contains non-alpha characters")
 
@@ -83,6 +105,10 @@ func (a Alpha) Validate() error {
 // Number validates any string containing only numeric characters.
 type Number string
 
+func (n Number) Value() (driver.Value, error) {
+	return string(n), nil
+}
+
 var errNumber = errors.New("string contains non-numeric characters")
 
 func (n Number) Validate() error {
@@ -95,8 +121,48 @@ func (n Number) Validate() error {
 	return nil
 }
 
+// Float validates any string containing numbers, including an initial minus
+// and a single decimal point.
+type Float string
+
+func (f Float) Value() (driver.Value, error) {
+	return string(f), nil
+}
+
+var errFloat = errors.New("float contains non-numeric characters")
+
+func (f Float) Validate() error {
+	if len(f) == 0 {
+		return errFloat
+	}
+
+	s := string(f)
+	if s[0] == '-' {
+		s = s[1:]
+	}
+
+	if strings.Count(s, ".") > 1 {
+		return errFloat
+	} else if s[0] == '.' || s[len(s)-1] == '.' {
+		return errFloat
+	}
+
+	i := strings.IndexFunc(s, func(r rune) bool {
+		return !((r >= '0' && r <= '9') || r == '.')
+	})
+	if i > -1 {
+		return errFloat
+	}
+
+	return nil
+}
+
 // Alphanumeric validates any string containing only letters or numbers.
 type Alphanumeric string
+
+func (a Alphanumeric) Value() (driver.Value, error) {
+	return string(a), nil
+}
 
 var errAlphanumeric = errors.New("string contains non-alphanumeric characters")
 
@@ -113,6 +179,10 @@ func (a Alphanumeric) Validate() error {
 // ASCII validates any string containing only ASCII characters.
 type ASCII string
 
+func (a ASCII) Value() (driver.Value, error) {
+	return string(a), nil
+}
+
 var errASCII = errors.New("string contains non-ASCII characters")
 
 func (a ASCII) Validate() error {
@@ -127,6 +197,10 @@ func (a ASCII) Validate() error {
 
 // Required validates any string that is not empty
 type Required string
+
+func (r Required) Value() (driver.Value, error) {
+	return string(r), nil
+}
 
 var errRequired = errors.New("string is required")
 
