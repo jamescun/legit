@@ -1,6 +1,7 @@
 package legit
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"testing"
 
@@ -59,6 +60,54 @@ func testString(t *testing.T, pass, fail Validator, failErr error) {
 	if assert.NotNil(t, err) {
 		assert.Equal(t, failErr, err)
 	}
+}
+
+func TestStringScan(t *testing.T) {
+	tests := []struct {
+		Name    string
+		Scanner sql.Scanner
+		Src     interface{}
+		Value   sql.Scanner
+		Error   error
+	}{
+		{"Lower/Fail", (*Lower)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"Lower/Success", (*Lower)(strPtr("")), "foo", (*Lower)(strPtr("foo")), nil},
+		{"Upper/Fail", (*Upper)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"Upper/Success", (*Upper)(strPtr("")), "foo", (*Upper)(strPtr("foo")), nil},
+		{"NoSpace/Fail", (*NoSpace)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"NoSpace/Success", (*NoSpace)(strPtr("")), "foo", (*NoSpace)(strPtr("foo")), nil},
+		{"Printable/Fail", (*Printable)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"Printable/Success", (*Printable)(strPtr("")), "foo", (*Printable)(strPtr("foo")), nil},
+		{"Alpha/Fail", (*Alpha)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"Alpha/Success", (*Alpha)(strPtr("")), "foo", (*Alpha)(strPtr("foo")), nil},
+		{"Number/Fail", (*Number)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"Number/Success", (*Number)(strPtr("")), "foo", (*Number)(strPtr("foo")), nil},
+		{"Float/Fail", (*Float)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"Float/Success", (*Float)(strPtr("")), "foo", (*Float)(strPtr("foo")), nil},
+		{"Alphanumeric/Fail", (*Alphanumeric)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"Alphanumeric/Success", (*Alphanumeric)(strPtr("")), "foo", (*Alphanumeric)(strPtr("foo")), nil},
+		{"ASCII/Fail", (*ASCII)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"ASCII/Success", (*ASCII)(strPtr("")), "foo", (*ASCII)(strPtr("foo")), nil},
+		{"Required/Fail", (*Required)(strPtr("")), 0, nil, errUnsupportedScan},
+		{"Required/Success", (*Required)(strPtr("")), "foo", (*Required)(strPtr("foo")), nil},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			err := test.Scanner.Scan(test.Src)
+			if test.Error == nil {
+				if assert.NoError(t, err) {
+					assert.Equal(t, test.Value, test.Scanner)
+				}
+			} else {
+				assert.Equal(t, test.Error, err)
+			}
+		})
+	}
+}
+
+func strPtr(s string) *string {
+	return &s
 }
 
 func TestStringValue(t *testing.T) {

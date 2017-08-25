@@ -7,8 +7,19 @@ import (
 	"unicode"
 )
 
+var errUnsupportedScan = errors.New("unsupported scan")
+
 // Lower validates any string not containing any uppercase characters.
 type Lower string
+
+func (l *Lower) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*l = Lower(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
 
 func (l Lower) Value() (driver.Value, error) {
 	return string(l), nil
@@ -29,6 +40,15 @@ func (l Lower) Validate() error {
 // Upper validates any string not containing any lowercase characters.
 type Upper string
 
+func (u *Upper) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*u = Upper(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
+
 func (u Upper) Value() (driver.Value, error) {
 	return string(u), nil
 }
@@ -47,6 +67,15 @@ func (u Upper) Validate() error {
 
 // NoSpace validates any string not containing any whitespace characters.
 type NoSpace string
+
+func (ns *NoSpace) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*ns = NoSpace(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
 
 func (ns NoSpace) Value() (driver.Value, error) {
 	return string(ns), nil
@@ -67,6 +96,15 @@ func (ns NoSpace) Validate() error {
 // Printable validates any string not containing any non-printing characters.
 type Printable string
 
+func (p *Printable) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*p = Printable(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
+
 func (p Printable) Value() (driver.Value, error) {
 	return string(p), nil
 }
@@ -85,6 +123,15 @@ func (p Printable) Validate() error {
 
 // Alpha validates any string containing only letters.
 type Alpha string
+
+func (a *Alpha) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*a = Alpha(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
 
 func (a Alpha) Value() (driver.Value, error) {
 	return string(a), nil
@@ -105,6 +152,15 @@ func (a Alpha) Validate() error {
 // Number validates any string containing only numeric characters.
 type Number string
 
+func (n *Number) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*n = Number(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
+
 func (n Number) Value() (driver.Value, error) {
 	return string(n), nil
 }
@@ -124,6 +180,15 @@ func (n Number) Validate() error {
 // Float validates any string containing numbers, including an initial minus
 // and a single decimal point.
 type Float string
+
+func (f *Float) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*f = Float(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
 
 func (f Float) Value() (driver.Value, error) {
 	return string(f), nil
@@ -160,6 +225,15 @@ func (f Float) Validate() error {
 // Alphanumeric validates any string containing only letters or numbers.
 type Alphanumeric string
 
+func (a *Alphanumeric) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*a = Alphanumeric(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
+
 func (a Alphanumeric) Value() (driver.Value, error) {
 	return string(a), nil
 }
@@ -179,6 +253,15 @@ func (a Alphanumeric) Validate() error {
 // ASCII validates any string containing only ASCII characters.
 type ASCII string
 
+func (a *ASCII) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*a = ASCII(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
+
 func (a ASCII) Value() (driver.Value, error) {
 	return string(a), nil
 }
@@ -197,6 +280,15 @@ func (a ASCII) Validate() error {
 
 // Required validates any string that is not empty
 type Required string
+
+func (r *Required) Scan(src interface{}) error {
+	if s, ok := src.(string); ok {
+		*r = Required(s)
+		return nil
+	}
+
+	return errUnsupportedScan
+}
 
 func (r Required) Value() (driver.Value, error) {
 	return string(r), nil
